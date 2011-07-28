@@ -39,17 +39,18 @@ from sqlalchemy import MetaData
 RE_ESCAPE = re.compile("[\x00-\x1f'\\\\\x7f-\xff]")
 escape = lambda v2: RE_ESCAPE.sub(lambda x: '\\x%02x' % ord(x.group(0)), v2)
 
+
 def main():
     parser = argparse.ArgumentParser(description='An awesomer pg_dump.')
 
     # pg_dump features
-    parser.add_argument('--host', type=str, nargs=1, default='localhost',
+    parser.add_argument('--host', type=str, default='localhost',
                    help='database server host or socket directory')
-    parser.add_argument('--port', '-p', type=int, nargs=1, default=5432,
+    parser.add_argument('--port', '-p', type=int, default=5432,
                    help='database server port number')
-    parser.add_argument('--username', '-U', type=str, nargs=1,
+    parser.add_argument('--username', '-U', type=str,
                    help='connect as specified database user')
-    parser.add_argument('dbname', type=str, nargs='*',
+    parser.add_argument('dbname', type=str,
                    help='the name of the database')
 
     parser.add_argument('--table', '-t', metavar='TABLE', type=str,
@@ -71,10 +72,10 @@ def main():
         args.username = [os.getlogin()]
 
     conn_str = 'postgres://%(username)s:@%(host)s:%(port)d/%(dbname)s' % {
-        'username': args.username[0],
+        'username': args.username,
         'host': args.host,
         'port': args.port,
-        'dbname': args.dbname[0],
+        'dbname': args.dbname,
     }
 
     engine = create_engine(conn_str)
@@ -94,6 +95,7 @@ def main():
             filters = [sql.text(f) for f in args.filter]
 
         query = sql.select(v.c, sql.and_(*filters))
+        sys.stderr.write('running query: %r\n' % query)
         cur = engine.execute(sql.select(v.c))
 
         for r in cur:
