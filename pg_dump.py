@@ -36,9 +36,8 @@ from sqlalchemy import create_engine
 from sqlalchemy import MetaData
 
 # shamelessly plagiarized from bpgsql
-ESCAPE_CHARS = re.compile("[\x00-\x1f'\\\\\x7f-\xff]")
-escape = lambda v2: ESCAPE_CHARS.sub(lambda x: '\\x%02x' % ord(x.group(0)), v2)
-
+RE_ESCAPE = re.compile("[\x00-\x1f'\\\\\x7f-\xff]")
+escape = lambda v2: RE_ESCAPE.sub(lambda x: '\\x%02x' % ord(x.group(0)), v2)
 
 def main():
     parser = argparse.ArgumentParser(description='An awesomer pg_dump.')
@@ -61,7 +60,7 @@ def main():
                    help='do NOT dump the named table(s)')
 
     # extensions
-    parser.add_argument('--filter', type=str, nargs=1, default="",
+    parser.add_argument('--filter', type=str, nargs=1, default=None,
                    help='connect as specified database user')
 
     args = parser.parse_args()
@@ -78,9 +77,6 @@ def main():
         'dbname': args.dbname[0],
     }
 
-    #from IPython.Shell import IPShellEmbed
-    #ipshell = IPShellEmbed([])
-
     engine = create_engine(conn_str)
     meta = MetaData()
     meta.reflect(bind=engine)
@@ -93,9 +89,14 @@ def main():
                         v.key in args.exclude_table):
             continue
 
+        filters = []
+        if not args.filter is None and len(args.filter) > 0:
+            filters = [sql.text(f) for f in args.filter]
+
+        query = sql.select(v.c, sql.and_(*filters))
         cur = engine.execute(sql.select(v.c))
 
-        for r in cur.fetchall():
+        for r in cur:
             row_dict = dict(r)
             insert_str = unicode(v.insert(values=row_dict))
 
