@@ -71,14 +71,14 @@ def main():
     if args.username is None or len(args.username) == 0:
         args.username = [os.getlogin()]
 
-    conn_str = 'postgresql+pg8000://%(username)s:@%(host)s:%(port)d/%(dbname)s' % {
+    conn_str = 'postgresql://%(username)s:@%(host)s:%(port)d/%(dbname)s' % {
         'username': args.username,
         'host': args.host,
         'port': args.port,
         'dbname': args.dbname,
     }
 
-    engine = create_engine(conn_str)
+    engine = create_engine(conn_str, server_side_cursors=True)
     meta = MetaData()
     meta.reflect(bind=engine)
 
