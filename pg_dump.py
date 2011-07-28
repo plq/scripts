@@ -29,6 +29,7 @@
 import argparse
 import os
 import re
+import sys
 
 from sqlalchemy import sql
 from sqlalchemy import create_engine
@@ -48,10 +49,16 @@ def main():
     parser.add_argument('--port', '-p', type=int, nargs=1, default=5432,
                    help='database server port number')
     parser.add_argument('--username', '-U', type=str, nargs=1,
-                   default=os.getlogin(),
                    help='connect as specified database user')
     parser.add_argument('dbname', type=str, nargs='*',
                    help='the name of the database')
+
+    parser.add_argument('--table', '-t', metavar='TABLE', type=str,
+                   nargs='*',
+                   help='dump the named table(s) only')
+    parser.add_argument('--exclude-table', '-T', metavar='TABLE', type=str,
+                   nargs='*',
+                   help='do NOT dump the named table(s)')
 
     # extensions
     parser.add_argument('--filter', type=str, nargs=1, default="",
@@ -59,8 +66,10 @@ def main():
 
     args = parser.parse_args()
 
-    if args.dbname is None:
-        args.dbname = args.username
+    if args.dbname is None or len(args.dbname) == 0:
+        args.dbname = [args.username]
+    if args.username is None or len(args.username) == 0:
+        args.username = [os.getlogin()]
 
     conn_str = 'postgres://%(username)s:@%(host)s:%(port)d/%(dbname)s' % {
         'username': args.username[0],
@@ -77,7 +86,12 @@ def main():
     meta.reflect(bind=engine)
 
     for v in meta.sorted_tables:
-        print args.filter
+        if  (args.table         is not None and len(args.table) > 0 and
+                    not v.key in args.table) \
+          or \
+            (args.exclude_table is not None and len(args.exclude_table) > 0 and
+                        v.key in args.exclude_table):
+            continue
 
         cur = engine.execute(sql.select(v.c))
 
