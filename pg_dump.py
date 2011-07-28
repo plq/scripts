@@ -41,6 +41,7 @@ escape = lambda v2: ESCAPE_CHARS.sub(lambda x: '\\x%02x' % ord(x.group(0)), v2)
 def main():
     parser = argparse.ArgumentParser(description='An awesomer pg_dump.')
 
+    # pg_dump features
     parser.add_argument('--host', type=str, nargs=1, default='localhost',
                    help='database server host or socket directory')
     parser.add_argument('--port', '-p', type=int, nargs=1, default=5432,
@@ -48,6 +49,11 @@ def main():
     parser.add_argument('--username', '-U', type=str, nargs=1, default=os.getlogin(),
                    help='connect as specified database user')
     parser.add_argument('dbname', nargs='*', default=None, help='BAR!')
+
+
+    # extensions
+    parser.add_argument('--filter', type=str, nargs=1, default=os.getlogin(),
+                   help='connect as specified database user')
 
     args = parser.parse_args()
 
