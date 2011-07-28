@@ -14,10 +14,10 @@
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -35,8 +35,9 @@ from sqlalchemy import create_engine
 from sqlalchemy import MetaData
 
 # shamelessly plagiarized from bpgsql
-ESCAPE_CHARS = re.compile("[\x00-\x1f'\\\\\x7f-\xff]") 
+ESCAPE_CHARS = re.compile("[\x00-\x1f'\\\\\x7f-\xff]")
 escape = lambda v2: ESCAPE_CHARS.sub(lambda x: '\\x%02x' % ord(x.group(0)), v2)
+
 
 def main():
     parser = argparse.ArgumentParser(description='An awesomer pg_dump.')
@@ -46,13 +47,14 @@ def main():
                    help='database server host or socket directory')
     parser.add_argument('--port', '-p', type=int, nargs=1, default=5432,
                    help='database server port number')
-    parser.add_argument('--username', '-U', type=str, nargs=1, default=os.getlogin(),
+    parser.add_argument('--username', '-U', type=str, nargs=1,
+                   default=os.getlogin(),
                    help='connect as specified database user')
-    parser.add_argument('dbname', nargs='*', default=None, help='BAR!')
-
+    parser.add_argument('dbname', type=str, nargs='*',
+                   help='the name of the database')
 
     # extensions
-    parser.add_argument('--filter', type=str, nargs=1, default=os.getlogin(),
+    parser.add_argument('--filter', type=str, nargs=1, default="",
                    help='connect as specified database user')
 
     args = parser.parse_args()
@@ -74,17 +76,16 @@ def main():
     meta = MetaData()
     meta.reflect(bind=engine)
 
-    ESCAPE_CHARS = re.compile("[\x00-\x1f'\\\\\x7f-\xff]")
-    escape = lambda v2: ESCAPE_CHARS.sub(lambda x: '\\x%02x' % ord(x.group(0)), v2)
-
     for v in meta.sorted_tables:
+        print args.filter
+
         cur = engine.execute(sql.select(v.c))
 
         for r in cur.fetchall():
             row_dict = dict(r)
             insert_str = unicode(v.insert(values=row_dict))
 
-            for k2,v2 in row_dict.items():
+            for k2, v2 in row_dict.items():
                 if v2 is None:
                     val = 'NULL'
                 else:
@@ -93,9 +94,9 @@ def main():
                     except:
                         val = u"'%s'" % v2
 
-                insert_str = insert_str.replace(':%s' % k2, val )
+                insert_str = insert_str.replace(':%s' % k2, val)
 
-            print insert_str.encode('utf8'),';'
+            print insert_str.encode('utf8'), ';'
 
     return 0
 
