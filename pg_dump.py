@@ -71,7 +71,7 @@ def main():
     if args.username is None or len(args.username) == 0:
         args.username = [os.getlogin()]
 
-    conn_str = 'postgres://%(username)s:@%(host)s:%(port)d/%(dbname)s' % {
+    conn_str = 'postgresql+pg8000://%(username)s:@%(host)s:%(port)d/%(dbname)s' % {
         'username': args.username,
         'host': args.host,
         'port': args.port,
