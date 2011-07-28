@@ -48,11 +48,14 @@ for v in meta.sorted_tables:
         insert_str = unicode(v.insert(values=row_dict))
 
         for k2,v2 in row_dict.items():
-            try:
-                val = escape(v2)
-            except:
-                val = unicode(v2)
+            if v2 is None:
+                val = 'NULL'
+            else:
+                try:
+                    val = u"E'%s'" % escape(v2)
+                except:
+                    val = u"'%s'" % v2
 
-            insert_str = insert_str.replace(':%s' % k2, u"E'%s'" % val)
+            insert_str = insert_str.replace(':%s' % k2, val )
 
         print insert_str.encode('utf8'),';'
