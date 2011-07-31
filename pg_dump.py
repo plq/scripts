@@ -61,7 +61,7 @@ def main():
                    help='do NOT dump the named table(s)')
 
     # extensions
-    parser.add_argument('--filter', type=str, nargs=1, default=None,
+    parser.add_argument('--filter', type=str, default=None,
                    help='connect as specified database user')
 
     args = parser.parse_args()
@@ -90,13 +90,13 @@ def main():
                         v.key in args.exclude_table):
             continue
 
-        filters = []
+        filter = None
         if not args.filter is None and len(args.filter) > 0:
-            filters = [sql.text(f) for f in args.filter]
+            filter = sql.text(args.filter)
 
-        query = sql.select(v.c, sql.and_(*filters))
-        sys.stderr.write('running query: %r\n' % query)
-        cur = engine.execute(sql.select(v.c))
+        query = sql.select(v.c, filter)
+        sys.stderr.write("running query: '%s'\n" % query)
+        cur = engine.execute(query)
 
         for r in cur:
             row_dict = dict(r)
@@ -110,8 +110,7 @@ def main():
                         val = u"E'%s'" % escape(v2)
                     except:
                         val = u"'%s'" % v2
-
-                insert_str = insert_str.replace(':%s' % k2, val)
+                insert_str = re.sub(r':%s([,\)])' % k2, r'%s\1' % val, insert_str, 1)
 
             print insert_str.encode('utf8'), ';'
 
