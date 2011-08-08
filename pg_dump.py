@@ -37,8 +37,7 @@ from sqlalchemy import MetaData
 
 # shamelessly plagiarized from bpgsql
 RE_ESCAPE = re.compile("[\x00-\x1f'\\\\\x7f-\xff]")
-escape = lambda v2: RE_ESCAPE.sub(lambda x: '\\x%02x' % ord(x.group(0)), v2)
-
+escape = lambda v2: RE_ESCAPE.sub(lambda x: '\\x%02x' % ord(x.group(0).decode('utf8')), v2)
 
 def main():
     parser = argparse.ArgumentParser(description='An awesomer pg_dump.')
