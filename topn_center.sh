@@ -1,6 +1,10 @@
 #!/bin/sh -x
 
-xrandr --auto;
+xrandr --auto; # turns out this does not work everywhere
+
+for i in $(xrandr | grep \ connected | cut -d " " -f 1); do
+    xrandr --output $i --auto;
+done;
 
 output=$(xrandr | grep \ connected | grep -v LVDS1 | cut -d " " -f1);
 
@@ -25,4 +29,3 @@ function add_1080i {
     mode_name="$(echo "${mode}" | cut -d\" -f2)"
     xrandr --newmode $mode
 }
-
