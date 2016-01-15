@@ -1,0 +1,23 @@
+# wingware cruft
+*.wpu
+*.wpr
+
+# emacs cruft
+*~
+*#*
+*flymake.py
+.ropeproject
+
+# netbeans cruft
+nbproject
+
+# pycharm cruft
+.idea/
+
+# kate cruft
+*.kate-swp
+.kateproject.d
+
+# vim cruft
+*.swp
+
