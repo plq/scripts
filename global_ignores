@@ -23,3 +23,6 @@ nbproject
 
 # virtualenv cruft
 virt-*
+
+# kde cruft
+.directory
