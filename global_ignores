@@ -26,3 +26,7 @@ virt-*
 
 # kde cruft
 .directory
+
+# 
+prod
+remote
