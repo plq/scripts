@@ -30,3 +30,6 @@ virt-*
 # 
 prod
 remote
+
+# svn cruft ?!
+.svn
