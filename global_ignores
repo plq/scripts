@@ -21,9 +21,6 @@ nbproject
 # vim cruft
 *.swp
 
-# virtualenv cruft
-virt-*
-
 # kde cruft
 .directory
 
