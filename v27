@@ -1,0 +1,9 @@
+#!/bin/bash
+
+path=$(pwd)
+while [[ "$path" != "" && ! -e "$path/virt-2.7" ]]; do
+    path=${path%/*}
+done
+echo $path/virt-2.7/bin/activate
+source $path/virt-2.7/bin/activate
+
