@@ -1,0 +1,8 @@
+###########################################################
+# Microsoft
+###########################################################
+
+# Microsoft Natural Ergonomic Keyboard 4000
+evdev:input:b0003v045Ep00DB*
+ KEYBOARD_KEY_c022d=scrollup                                  # zoomin
+ KEYBOARD_KEY_c022e=scrolldown                                # zoomout

@@ -1,0 +1,5 @@
+"xdotool click --repeat 3 --delay 66 4"
+  XF86ScrollUp
+
+"xdotool click --repeat 3 --delay 66 5"
+  XF86ScrollDown
