@@ -30,3 +30,6 @@ remote
 
 # svn cruft ?!
 .svn
+
+# arskom reposutil cruft
+.with-*
