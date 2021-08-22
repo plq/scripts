@@ -8,6 +8,9 @@
 *flymake.py
 .ropeproject
 
+# Autotools QtCreator cruft
+Makefile.am.user
+
 # netbeans cruft
 nbproject
 
